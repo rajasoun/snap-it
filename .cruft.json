@@ -1,0 +1,16 @@
+{
+  "template": "https://github.com/rajasoun/cookiecutter-docker-shell",
+  "commit": "4f179770381ef006c45f0eba473ab686606582c7",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "snap-it ",
+      "project_slug": "snap-it ",
+      "project_description": "Docker as an Integrated Development Environment",
+      "security_mailer": "devsecops@icloud.com",
+      "author_full_name": "Raja. S",
+      "_template": "https://github.com/rajasoun/cookiecutter-docker-shell"
+    }
+  },
+  "directory": null
+}
