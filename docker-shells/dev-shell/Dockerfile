@@ -32,10 +32,6 @@ LABEL distro="alpine" distro_version="3.13.0" architecture="x86_64"
 RUN wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | zsh || true
 ARG ZSH_CUSTOM=$APP_USER_HOME/.oh-my-zsh/custom
 
-# install zprezto
-RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
-ARG ZDOTDIR=$APP_USER_HOME/.zprezto
-
 ## Copy dotfiles
 COPY --chown=$APP_USER:$APP_USER_GROUP dotfiles/.zshrc $APP_USER_HOME/.zshrc
 COPY --chown=$APP_USER:$APP_USER_GROUP dotfiles/.zprofile $APP_USER_HOME/.zprofile
