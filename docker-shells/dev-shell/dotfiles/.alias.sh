@@ -1,13 +1,7 @@
 #!/usr/bin/env sh
 
-# AWS Vault zsh shell
-alias aws-vault-env='bash -c $HOME/.aws_vault_exec.bash'
-
-# Mac Alias
-alias clean-mac='find . -name '.DS_Store' -type f -delete'
-
 # zsh config
-alias zshconfig='code ~/.zshrc ~/.zprofile ~/.alias.sh'
+alias zshconfig='vim ~/.zshrc ~/.zprofile ~/.alias.sh'
 
 # Find port 
 lsof_port() {

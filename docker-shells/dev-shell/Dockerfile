@@ -2,68 +2,43 @@
 ## Base builder image
 ##
 
-FROM alpine:latest as builder
+FROM debian:buster-slim as dev-shell-builder
 
-## Install base packages
-RUN apk --update add --no-cache --virtual \
-    git openssl-dev wget bash bash-completion make neovim\
-    zsh tmux openssh-client zsh ncurses \
-    curl less man \
-    && mv /etc/profile.d/color_prompt /etc/profile.d/color_prompt.sh \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-## Install zsh 
-RUN RUN set -ex \
-    && curl -L \
-    https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | zsh || true
-
-# Install Vim Plug for plugin management
-RUN RUN set -ex \
-    && curl -fLo ~/.config/nvim/autoload/plug.vim \
-        --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-# Install plugins
-RUN RUN set -ex \
-    && nvim +PlugInstall +qall >> /dev/null# Install Tmux Plugin Manager \
-    && git clone https://github.com/tmux-plugins/tpm .tmux/plugins/tpm \
-    && .tmux/plugins/tpm/bin/install_plugins
-
-## Copy dotfiles
-COPY dotfiles/.zshrc .zshrc
-COPY dotfiles/.zprofile .zprofile
-COPY dotfiles/.alias.sh .alias.sh
-
-# COPY vimrc .config/nvim/init.vim
-# COPY tmux.conf .tmux.conf
-
-
-##
-## Node.js
-##
-
-FROM node:15.10.0-alpine3.13 as nodejs-builder
-
-## Install Node Packages
 RUN set -ex \
-    && npm install sfdx-cli --global \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  && apt-get update \
+  && apt-get install --yes --no-install-recommends \
+  ca-certificates wget git zsh lsof vim\
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* *.deb
+
+ENV APP_USER=ubuntu
+ENV APP_USER_GROUP=root
+ARG APP_USER_HOME=/home/$APP_USER
+
+RUN useradd -rm -d /home/$APP_USER -s /bin/zsh -g root -G sudo -u 1001 $APP_USER
+
+USER $APP_USER
+WORKDIR $APP_USER_HOME
 
 ##
-## snap shell image
+## dev-shell
 ##
 
-FROM builder
+FROM dev-shell-builder
 LABEL Vendor="Alpine"
 LABEL distro="alpine" distro_version="3.13.0" architecture="x86_64"
 
+# install oh-my-zsh
+RUN wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | zsh || true
+ARG ZSH_CUSTOM=$APP_USER_HOME/.oh-my-zsh/custom
 
+# install zprezto
+RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
+ARG ZDOTDIR=$APP_USER_HOME/.zprezto
 
-# Install Nodejs
-COPY --from=nodejs-builder /usr/ /usr/
+## Copy dotfiles
+COPY --chown=$APP_USER:$APP_USER_GROUP dotfiles/.zshrc $APP_USER_HOME/.zshrc
+COPY --chown=$APP_USER:$APP_USER_GROUP dotfiles/.zprofile $APP_USER_HOME/.zprofile
+COPY --chown=$APP_USER:$APP_USER_GROUP dotfiles/.alias.sh $APP_USER_HOME/.alias.sh
 
-## System
-ENV TIMEZONE="Etc/UTC" \
-    TERM="xterm" \
-    HOSTNAME="sfdc-snapit"
-
-ENV UMASK="0022"
+CMD ["/usr/bin/zsh"]
