@@ -79,3 +79,5 @@ ENV DUO_IKEY="" \
     DUO_FAILMODE="secure" \
     DUO_AUTOPUSH="yes" \
     DUO_PROMPTS="1"
+
+ENTRYPOINT ["/bin/bash"]
