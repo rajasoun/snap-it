@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/rajasoun/cookiecutter-docker-shell",
-  "commit": "4f179770381ef006c45f0eba473ab686606582c7",
+  "commit": "55193559ef398be5d893e2b1e8b9d62e94ab133e",
   "checkout": null,
   "context": {
     "cookiecutter": {
